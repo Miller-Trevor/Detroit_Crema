@@ -58,13 +58,13 @@ class DefaultTemps(tk.Toplevel):
         tk.Label(self, image=self.home_image, borderwidth=0,compound="center",highlightthickness = 0, padx=0, pady=30).pack()
         #Dark Roast Button
         self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command = lambda: [self.set_dark_temp(), self.navigate_to_window()])
-        self.button_1.place(x=550, y=150)
+        self.button_1.place(x=150, y=380)
         #Medium Roast Button
         self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command = lambda: [self.set_med_temp(), self.navigate_to_window()])
-        self.button_3.place(x=550, y=250)
+        self.button_3.place(x=350, y=380)
         #Light Roast Button
         self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command = lambda: [self.set_light_temp(), self.navigate_to_window()])
-        self.button_2.place(x=550, y=350)
+        self.button_2.place(x=550, y=380)
         
         self.back_button = tk.Button(self, text="Back", command=self.go_back)
         self.back_button.place(x=20, y=20)
@@ -161,6 +161,9 @@ class BrewProfileWindow(tk.Toplevel):
         self.button_1_image = tk.PhotoImage(file=("button_4.png"))
         self.button_2_image = tk.PhotoImage(file=("button_5.png"))
         self.button_3_image = tk.PhotoImage(file=("button_6.png"))
+        self.button_9_image = tk.PhotoImage(file=("button_9.png"))
+        self.button_10_image = tk.PhotoImage(file=("button_10.png"))
+        self.button_11_image = tk.PhotoImage(file=("button_11.png"))
         self.profile = tk.StringVar()
         
         # Place the Logo
@@ -174,13 +177,16 @@ class BrewProfileWindow(tk.Toplevel):
         self.button_2.place(x=30, y=150)
         # Default Profile Button
         self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command= lambda: [self.profile == 'Default', self.go_to_default_temps()])
-        self.button_3.place(x=300, y=150)
+        self.button_3.place(x=290, y=150)
         # 4th Button
-        self.button_4 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming Allonge', self.go_to_default_temps()])
-        self.button_4.place(x=150, y=300)
+        self.button_4 = tk.Button(self, image=self.button_11_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming Allonge', self.go_to_default_temps()])
+        self.button_4.place(x=150, y=250)
         # 5th Button
-        self.button_5 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command= lambda: [self.profile == 'Allonge', self.go_to_default_temps])
-        self.button_5.place(x=450, y=300)
+        self.button_5 = tk.Button(self, image=self.button_10_image, bg= "#04043B", command= lambda: [self.profile == 'Allonge', self.go_to_default_temps])
+        self.button_5.place(x=420, y=250)
+        
+        self.purge_button = tk.Button(self, image=self.button_9_image, bg= "#04043B")
+        self.purge_button.place(x = 280, y = 380)
 
 
     # Function to go to Brew Window
@@ -326,7 +332,9 @@ class TextBoxes(tk.Toplevel):
         self.preinfuse_bar = tk.IntVar()  
         self.brew_time = tk.IntVar()                                                                                                                                            
         self.weight = tk.IntVar()
+        self.home_image = tk.PhotoImage(file=("image_1.png"))
         
+        tk.Label(self, image=self.home_image, borderwidth=0,compound="center",highlightthickness = 0, padx=0, pady=30).pack()
         
         self.preinfuse_label = tk.Label(self, text="Set Preinfuse Time (sec)", font=("Arial", 15), bg= "#04043B", fg= "#ff8c00")
         self.preinfuse_label.place(x= 50, y = 150)
