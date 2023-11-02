@@ -9,6 +9,7 @@ import Functions as f
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 import CustomPlotMaker as m
+from csv import DictWriter
 #from matplotlib.backends.bd_tkagg import BackendFigureCanvasTkAgg
 
 class WelcomePage(tk.Tk):
@@ -53,21 +54,28 @@ class DefaultTemps(tk.Toplevel):
         self.button_1_image = tk.PhotoImage(file=("button_1.png"))
         self.button_2_image = tk.PhotoImage(file=("button_2.png"))
         self.button_3_image = tk.PhotoImage(file=("button_3.png"))
+        self.weight = tk.IntVar()
         
         #Create Label to hold the Logo
         tk.Label(self, image=self.home_image, borderwidth=0,compound="center",highlightthickness = 0, padx=0, pady=30).pack()
         #Dark Roast Button
-        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command = lambda: [self.set_dark_temp(), self.navigate_to_window()])
+        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command = lambda: [self.set_dark_temp(), self.navigate_to_window(), self.get_weight_targ_val(), self.get_data()])
         self.button_1.place(x=150, y=380)
         #Medium Roast Button
-        self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command = lambda: [self.set_med_temp(), self.navigate_to_window()])
+        self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command = lambda: [self.set_med_temp(), self.navigate_to_window(), self.get_weight_targ_val(), self.get_data()])
         self.button_3.place(x=350, y=380)
         #Light Roast Button
-        self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command = lambda: [self.set_light_temp(), self.navigate_to_window()])
+        self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command = lambda: [self.set_light_temp(), self.navigate_to_window(), self.get_weight_targ_val(), self.get_data()])
         self.button_2.place(x=550, y=380)
         
         self.back_button = tk.Button(self, text="Back", command=self.go_back)
         self.back_button.place(x=20, y=20)
+        
+        self.weight_label = tk.Label(self, text="Enter Dry Weight (g)", font=("Arial", 15), bg= "#04043B", fg= "#ff8c00")
+        self.weight_label.place(x = 300, y= 200)
+
+        self.weight_entry = tk.Spinbox(self, textvariable= self.weight, width=5, from_=0, to=20, font=Font(size=28, weight='bold'))
+        self.weight_entry.place(x= 350, y = 240)
         
         
         
@@ -83,9 +91,18 @@ class DefaultTemps(tk.Toplevel):
         s.targ_temp = 93
     def set_light_temp(self):
         s.targ_temp = 96
+    def get_weight_targ_val(self):
+        s.targ_weight = self.weight.get() * 2
     def go_back(self):
         self.master.deiconify()
         self.withdraw()
+    def get_data(self):
+        field_names = ['Weight', 'Temp', 'Preinfuse Pressure', 'Preinfuse Time', 'Brew Time', 'Pressure Array', 'Time Array']
+        data = {'Weight': s.targ_weight, 'Temp': s.targ_temp, 'Preinfuse Pressure': s.preinfuse_bar, 'Preinfuse Time': s.preinfuse_time, 'Brew Time': s.brew_time, 'Pressure Array': s.targ_pressure_arr, 'Time Array': s.targ_time_arr}
+        with open('data1.csv', 'a') as f_object:
+            dictwriter_object = DictWriter(f_object, fieldnames=field_names)
+            dictwriter_object.writerow(data)
+            f_object.close
 #Brew Profile Window Class
 class BrewWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -170,19 +187,19 @@ class BrewProfileWindow(tk.Toplevel):
         tk.Label(self, image=self.home_image, borderwidth=0,compound="center",highlightthickness = 0, padx=0, pady=30).pack()
         
         # Blooming Profile Button
-        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming', self.go_to_default_temps()])
+        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming', self.go_to_default_temps(), self.set_blooming_plot()])
         self.button_1.place(x=550, y=150)
         # Custom Profile Button
         self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command=self.go_to_text_boxes)
         self.button_2.place(x=30, y=150)
         # Default Profile Button
-        self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command= lambda: [self.profile == 'Default', self.go_to_default_temps()])
+        self.button_3 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command= lambda: [self.profile == 'Default', self.go_to_default_temps(), self.set_default_plot()])
         self.button_3.place(x=290, y=150)
         # 4th Button
-        self.button_4 = tk.Button(self, image=self.button_11_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming Allonge', self.go_to_default_temps()])
+        self.button_4 = tk.Button(self, image=self.button_11_image, bg= "#04043B", command= lambda: [self.profile == 'Blooming Allonge', self.go_to_default_temps(), self.set_bloomingallonge_plot()])
         self.button_4.place(x=150, y=250)
         # 5th Button
-        self.button_5 = tk.Button(self, image=self.button_10_image, bg= "#04043B", command= lambda: [self.profile == 'Allonge', self.go_to_default_temps])
+        self.button_5 = tk.Button(self, image=self.button_10_image, bg= "#04043B", command= lambda: [self.profile == 'Allonge', self.go_to_default_temps(), self.set_allonge_plot()])
         self.button_5.place(x=420, y=250)
         
         self.purge_button = tk.Button(self, image=self.button_9_image, bg= "#04043B")
@@ -195,18 +212,26 @@ class BrewProfileWindow(tk.Toplevel):
         self.default_temps = DefaultTemps(self)
         # Hide Brew Profile Window
         self.withdraw()
-    # def set_plot_arrs(self):
-    #     match self.profile:
-    #         case 'Default':
-    #             s.targ_time_arr, s.targ_pressure_arr = [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]
-    #         case 'Blooming':
-    #             s.targ_time_arr, s.targ_pressure_arr = [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]
-    #         case 'Blooming Allonge':
-    #             s.targ_time_arr, s.targ_pressure_arr = [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]
-    #         case 'Lever':
-    #             s.targ_time_arr, s.targ_pressure_arr = [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]
-    #         case 'Allonge':
-    #             s.targ_time_arr, s.targ_pressure_arr = [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]
+    def set_default_plot(self):
+        s.targ_time_arr, s.targ_pressure_arr = [0,8,13.5,19,24.5,30], [1,1,9,9,9,9] 
+        s.preinfuse_time = 8
+        s.preinfuse_bar = 1
+        s.brew_time = 30
+    def set_blooming_plot(self):
+        s.targ_time_arr, s.targ_pressure_arr = [0,8,13.5,19,24.5,35], [3,3,9,9,0,0]
+        s.preinfuse_time = 8
+        s.preinfuse_bar = 3
+        s.brew_time = 35
+    def set_bloomingallonge_plot(self):
+        s.targ_time_arr, s.targ_pressure_arr = [0,10,20,30,40,50], [1,1,2,2,2,1]
+        s.preinfuse_time = 10
+        s.preinfuse_bar = 1
+        s.brew_time = 50
+    def set_allonge_plot(self):
+        s.targ_time_arr, s.targ_pressure_arr = [0,8,13.5,19,24.5,30], [1,1,1,1,1,1,1]
+        s.preinfuse_time = 8
+        s.preinfuse_bar = 1
+        s.brew_time = 30
             
 
         #self.delta_t_brew = int((s.brew_time - s.preinfuse_time)/5)
@@ -268,13 +293,13 @@ class CustomizeWindow(tk.Toplevel):
         # self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command=self.go_to_brew_page)
         # self.button_1.place(x=30, y=30)
         
-        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command = lambda: [self.set_dark_temp(), self.go_to_brew_page])
+        self.button_1 = tk.Button(self, image=self.button_1_image, bg= "#04043B", command = lambda: [self.set_dark_temp(), self.go_to_brew_page(), self.get_data()])
         self.button_1.place(x=150, y=380)
         #Medium Roast Button
-        self.button_2 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command = lambda: [self.set_med_temp(), self.go_to_brew_page()])
+        self.button_2 = tk.Button(self, image=self.button_3_image, bg= "#04043B", command = lambda: [self.set_med_temp(), self.go_to_brew_page(), self.get_data()])
         self.button_2.place(x=350, y=380)
         #Light Roast Button
-        self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command = lambda: [self.set_light_temp(), self.go_to_brew_page()])
+        self.button_2 = tk.Button(self, image=self.button_2_image, bg= "#04043B", command = lambda: [self.set_light_temp(), self.go_to_brew_page(), self.get_data()])
         self.button_2.place(x=550, y=380)
 
         self.back_button = tk.Button(self, text="Back", command= self.go_back)
@@ -316,7 +341,14 @@ class CustomizeWindow(tk.Toplevel):
         self.set_plot_arrs()
         self.master.deiconify()
         self.withdraw()
-        
+    def get_data(self):
+        field_names = ['Weight', 'Temp', 'Preinfuse Pressure', 'Preinfuse Time', 'Brew Time', 'Pressure Array', 'Time Array']
+        data = {'Weight': s.targ_weight, 'Temp': s.targ_temp, 'Preinfuse Pressure': s.preinfuse_bar, 'Preinfuse Time': s.preinfuse_time, 'Brew Time': s.brew_time, 'Pressure Array': s.targ_pressure_arr, 'Time Array': s.targ_time_arr}
+        with open('data1.csv', 'a') as f_object:
+            dictwriter_object = DictWriter(f_object, fieldnames=field_names)
+            dictwriter_object.writerow(data)
+            f_object.close
+        #df.to_csv('C:/Users/tmiller4/Desktop/DetroitCremaGUI/DetroitCremaGUI/data/data1.csv')
 class TextBoxes(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -379,7 +411,6 @@ class TextBoxes(tk.Toplevel):
     def get_brew_time(self):
         s.brew_time = self.brew_time.get()
     def go_back(self):
-        self.canvas.get_tk_widget().pack_forget()
         self.master.deiconify()
         self.withdraw()
 
